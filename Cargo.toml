@@ -1,0 +1,15 @@
+[package]
+name = "sushii-rules-engine"
+version = "0.1.0"
+authors = ["drklee3 <derrick@dlee.dev>"]
+edition = "2018"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+tokio = "1.2.0"
+async-trait = "0.1.42"
+typetag = "0.1"
+typemap_rev = "0.1.4"
+twilight-model = "0.3.2"
+futures = "0.3.12"
+async-recursion = "0.3.2"
