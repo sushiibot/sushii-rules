@@ -2,19 +2,63 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use twilight_model::gateway::event::DispatchEvent;
 
+use crate::model::Context;
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "operator", content = "value")]
+pub enum StringConstraint {
+    Equals(String),
+    NotEquals(String),
+    Contains(String),
+    ContainsAll(Vec<String>),
+    ContainsAny(Vec<String>),
+    DoesNotContain(String),
+    DoesNotContainAny(Vec<String>),
+    In(Vec<String>),
+    NotIn(Vec<String>),
+}
+
+impl StringConstraint {
+    #[rustfmt::skip]
+    pub fn check_string(&self, in_str: &str) -> bool {
+        match self {
+            StringConstraint::Equals(s) => {
+                in_str == *s
+            }
+            StringConstraint::NotEquals(s) => {
+                in_str != *s
+            }
+            StringConstraint::Contains(s) => {
+                in_str.contains(s)
+            }
+            StringConstraint::ContainsAll(strs) => {
+                strs.iter().all(|s| in_str.contains(s))
+            },
+            StringConstraint::ContainsAny(strs) => {
+                strs.iter().any(|s| in_str.contains(s))
+            },
+            StringConstraint::DoesNotContain(s) => {
+                !in_str.contains(s)
+            },
+            StringConstraint::DoesNotContainAny(strs) => {
+                !strs.iter().all(|s| in_str.contains(s))
+            },
+            StringConstraint::In(strs) => {
+                strs.iter().all(|s| s.contains(&in_str))
+            }
+            StringConstraint::NotIn(strs) => {
+                !strs.iter().all(|s| s.contains(&in_str))
+            }
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "message_field", content = "value")]
 pub enum MessageConstraint {
-    ContentEquals(String),
-    ContentNotEquals(String),
-    ContentContains(String),
-    ContentContainsAll(Vec<String>),
-    ContentContainsAny(Vec<String>),
-    ContentDoesNotContain(String),
-    ContentDoesNotContainAny(Vec<String>),
-    ContentIn(Vec<String>),
-    ContentNotIn(Vec<String>),
+    Content(StringConstraint),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -25,40 +69,16 @@ pub enum Constraint {
 }
 
 impl Constraint {
-    pub async fn check_event(&self, event: &DispatchEvent) -> Result<bool, Box<dyn Error>> {
+    pub async fn check_event(
+        &self,
+        event: &DispatchEvent,
+        context: &Context,
+    ) -> Result<bool, Box<dyn Error>> {
         let val = match (self, event) {
-            #[rustfmt::skip]
-            (Constraint::Message(c), DispatchEvent::MessageCreate(msg)) => {
-                match c {
-                    MessageConstraint::ContentEquals(s) => {
-                        msg.content == *s
-                    }
-                    MessageConstraint::ContentNotEquals(s) => {
-                        msg.content != *s
-                    }
-                    MessageConstraint::ContentContains(s) => {
-                        msg.content.contains(s)
-                    }
-                    MessageConstraint::ContentContainsAll(strs) => {
-                        strs.iter().all(|s| msg.content.contains(s))
-                    },
-                    MessageConstraint::ContentContainsAny(strs) => {
-                        strs.iter().any(|s| msg.content.contains(s))
-                    },
-                    MessageConstraint::ContentDoesNotContain(s) => {
-                        !msg.content.contains(s)
-                    },
-                    MessageConstraint::ContentDoesNotContainAny(strs) => {
-                        !strs.iter().all(|s| msg.content.contains(s))
-                    },
-                    MessageConstraint::ContentIn(strs) => {
-                        strs.iter().all(|s| s.contains(&msg.content))
-                    }
-                    MessageConstraint::ContentNotIn(strs) => {
-                        !strs.iter().all(|s| s.contains(&msg.content))
-                    }
-                }
-            },
+            (
+                Constraint::Message(MessageConstraint::Content(c)),
+                DispatchEvent::MessageCreate(msg),
+            ) => c.check_string(&msg.content),
             _ => unimplemented!(),
         };
 
