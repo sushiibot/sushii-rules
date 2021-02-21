@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use twilight_model::gateway::event::DispatchEvent;
 
-use crate::model::{ConditionResult, Constraint, Context, Status};
+use crate::model::{Constraint, Context};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Condition {
@@ -28,7 +28,7 @@ pub enum Condition {
 
 impl Condition {
     #[async_recursion]
-    async fn check_event(
+    pub async fn check_event(
         &self,
         event: &DispatchEvent,
         context: &Context,
@@ -69,7 +69,7 @@ impl Condition {
 
                 return Ok(count >= min_count);
             }
-            Condition::Condition { ref constraint } => constraint.check_event(event).await,
+            Condition::Condition { ref constraint } => constraint.check_event(event, context).await,
         }
     }
 }
