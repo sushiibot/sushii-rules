@@ -1,11 +1,12 @@
 use async_recursion::async_recursion;
 use serde::{Deserialize, Serialize};
+use schemars::JsonSchema;
 use std::error::Error;
 use twilight_model::gateway::event::DispatchEvent;
 
 use crate::model::{Constraint, Context};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub enum Condition {
     And {
         and: Vec<Condition>,
