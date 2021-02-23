@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+use schemars::JsonSchema;
 use twilight_model::gateway::event::DispatchEvent;
 
 use crate::model::Context;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "operator", content = "value")]
 pub enum StringConstraint {
@@ -17,51 +18,75 @@ pub enum StringConstraint {
     DoesNotContainAny(Vec<String>),
     In(Vec<String>),
     NotIn(Vec<String>),
+    StartsWith(String),
+    DoesNotStartsWith(String),
+    EndsWith(String),
+    DoesNotEndsWith(String),
 }
 
 impl StringConstraint {
     #[rustfmt::skip]
     pub fn check_string(&self, in_str: &str) -> bool {
         match self {
-            StringConstraint::Equals(s) => {
+            Self::Equals(s) => {
                 in_str == *s
             }
-            StringConstraint::NotEquals(s) => {
+            Self::NotEquals(s) => {
                 in_str != *s
             }
-            StringConstraint::Contains(s) => {
+            Self::Contains(s) => {
                 in_str.contains(s)
             }
-            StringConstraint::ContainsAll(strs) => {
+            Self::ContainsAll(strs) => {
                 strs.iter().all(|s| in_str.contains(s))
             },
-            StringConstraint::ContainsAny(strs) => {
+            Self::ContainsAny(strs) => {
                 strs.iter().any(|s| in_str.contains(s))
             },
-            StringConstraint::DoesNotContain(s) => {
+            Self::DoesNotContain(s) => {
                 !in_str.contains(s)
             },
-            StringConstraint::DoesNotContainAny(strs) => {
+            Self::DoesNotContainAny(strs) => {
                 !strs.iter().all(|s| in_str.contains(s))
             },
-            StringConstraint::In(strs) => {
+            Self::In(strs) => {
                 strs.iter().all(|s| s.contains(&in_str))
             }
-            StringConstraint::NotIn(strs) => {
+            Self::NotIn(strs) => {
                 !strs.iter().all(|s| s.contains(&in_str))
+            }
+            Self::StartsWith(s) => {
+                in_str.starts_with(s)
+            }
+            Self::DoesNotStartsWith(s) => {
+                !in_str.starts_with(s)
+            }
+            Self::EndsWith(s) => {
+                in_str.ends_with(s)
+            }
+            Self::DoesNotEndsWith(s) => {
+                !in_str.ends_with(s)
             }
         }
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-#[serde(tag = "message_field", content = "value")]
-pub enum MessageConstraint {
-    Content(StringConstraint),
+#[serde(tag = "field_type", content = "value")]
+pub enum UserConstraint {
+    Username(StringConstraint),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "field_type", content = "value")]
+pub enum MessageConstraint {
+    Content(StringConstraint),
+    Author(UserConstraint),
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "event_type", content = "value")]
 pub enum Constraint {
