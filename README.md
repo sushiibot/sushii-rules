@@ -1,6 +1,7 @@
 # sushii-rules
 
-Rules engine for processing Discord events with user configurable logic.
+Rules engine for processing Discord events with user configurable logic. In very
+early development and mostly experimentation.
 
 ## Rule Configuration
 
@@ -13,9 +14,50 @@ Rules engine for processing Discord events with user configurable logic.
      * etc.
    * Member join
      * username -> String conditions
-     * 
+     * isBot -> bool conditions
+     * isVerifiedBot -> bool conditions
+     * previousNumberOfJoins -> Integer conditions
    * etc.
 3. Actions
+   * Discord actions
+     * Message
+     * Add role
+     * Ban
+     * Kick
+     * etc
+   * sushii actions
+     * Warn
+     * Mute
+   * Other actions
+     * Sleep (sleeps longer than x minutes store in db and poll?)
+     * trigger another rule? (prevent infinite looping, disallow recursive rules or add a TTL)
+     * add to quota
+
+## Rule Persistence
+
+guild_rules
+
+* rules can only have 1 trigger
+
+| rule_id | guild_id | rule_name | trigger_event |
+| ------- | -------- | --------- | ------------- |
+| uuid    | bigint   | text      | text          |
+
+guild_rule_conditions
+
+* json data of all conditions for given rule
+
+| condition_id | guild_id               | condition data |
+| ------------ | ---------------------- | -------------- |
+| uuid         | fk guild_rules.rule_id | json           |
+
+guild_rule_actions
+
+* json data of all action steps
+
+| action_id | condition_id                | actions data |
+| --------- | --------------------------- | ------------ |
+| uuid      | fk guild_rule_conditions.id | json         |
 
 ## Conditions
 
@@ -27,14 +69,27 @@ make it easier for reuse and organization.
     * ==
     * startsWith
     * contains word from word list
-    * languageIs (language-api)
+    * languageIs/IsNot/IsIn/IsNotIn (language-api)
+    * % uppercase
+    * % non-alphanumeric letters
+    * number of lines
+    * length
     * etc
   * Integers
   * DateTime
+  * bool
 * Discord Types - should be just using the underlying ID / integer comparisons,
   but UI should show separately + a list of guild channels)
   * Channel
   * Role
+* sushii types
+  * Warns
+    * number of warns
+  * Mutes
+  * Quotas (rate limiting with governor crate)
+    * number in last x minutes
+    * number in a row
+  * Level
 
 ## Word List
 
