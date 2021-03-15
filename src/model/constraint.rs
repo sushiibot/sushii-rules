@@ -97,7 +97,7 @@ impl Constraint {
     pub async fn check_event(
         &self,
         event: &DispatchEvent,
-        context: &Context,
+        _context: &Context,
     ) -> Result<bool, Box<dyn Error>> {
         let val = match (self, event) {
             (

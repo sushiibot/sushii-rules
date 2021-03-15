@@ -5,7 +5,9 @@ early development and mostly experimentation.
 
 ## Rule Configuration
 
-1. Trigger (Discord gateway event)
+1. Trigger
+   * Discord gateway events
+   * Quota exceeded
 2. Conditions (Different condition types per event)
    * Messages
      * message content -> String conditions
@@ -35,29 +37,38 @@ early development and mostly experimentation.
 
 ## Rule Persistence
 
+guild_rule_groups
+
+* set of multiple rules
+* a certain "feature" might contain a set of multiple rules
+
+| id   | guild_id | name |
+| ---- | -------- | ---- |
+| uuid | bigint   | text |
+
 guild_rules
 
 * rules can only have 1 trigger
 
-| rule_id | guild_id | rule_name | trigger_event |
-| ------- | -------- | --------- | ------------- |
-| uuid    | bigint   | text      | text          |
+| id   | rule_group_id           | rule_name | trigger_event |
+| ---- | ----------------------- | --------- | ------------- |
+| uuid | fk guild_rule_groups.id | text      | text          |
 
 guild_rule_conditions
 
 * json data of all conditions for given rule
 
-| condition_id | guild_id               | condition data |
-| ------------ | ---------------------- | -------------- |
-| uuid         | fk guild_rules.rule_id | json           |
+| id   | rule_id           | condition data |
+| ---- | ----------------- | -------------- |
+| uuid | fk guild_rules.id | json           |
 
 guild_rule_actions
 
 * json data of all action steps
 
-| action_id | condition_id                | actions data |
-| --------- | --------------------------- | ------------ |
-| uuid      | fk guild_rule_conditions.id | json         |
+| id   | condition_id                | actions data |
+| ---- | --------------------------- | ------------ |
+| uuid | fk guild_rule_conditions.id | json         |
 
 ## Conditions
 

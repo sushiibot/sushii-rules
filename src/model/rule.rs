@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use schemars::JsonSchema;
 use std::error::Error;
-use twilight_model::gateway::event::{DispatchEvent, EventType};
+use twilight_model::gateway::event::{DispatchEvent};
 
 use crate::model::{Condition, Context};
 
