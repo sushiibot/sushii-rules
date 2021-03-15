@@ -42,7 +42,7 @@ impl Condition {
                     }
                 }
 
-                return Ok(true);
+                Ok(true)
             }
             Condition::Not { not: ref c } => {
                 return c.check_event(event, context).await.map(|r| !r);
@@ -54,7 +54,7 @@ impl Condition {
                     }
                 }
 
-                return Ok(false);
+                Ok(false)
             }
             Condition::AtLeast {
                 min_count,
@@ -68,7 +68,7 @@ impl Condition {
                     }
                 }
 
-                return Ok(count >= min_count);
+                Ok(count >= min_count)
             }
             Condition::Condition { ref constraint } => constraint.check_event(event, context).await,
         }
