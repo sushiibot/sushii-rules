@@ -1,14 +1,16 @@
-use serde::{Deserialize, Serialize};
 use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
-use twilight_model::gateway::event::{DispatchEvent};
+use twilight_model::gateway::event::DispatchEvent;
 
-use crate::model::{Condition, Context};
+use crate::model::{Condition, Context, Trigger};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct Rule {
-    // pub trigger: EventType,
+    pub trigger: Trigger,
     pub conditions: Condition,
+    /// Actions are executed sequentially if condition passes
+    pub actions: Vec<Action>,
 }
 
 impl Rule {

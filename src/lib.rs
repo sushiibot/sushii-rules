@@ -26,4 +26,6 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+pub mod error;
 pub mod model;
+pub mod persistence;

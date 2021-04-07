@@ -5,8 +5,9 @@ pub mod context;
 pub mod engine;
 pub mod rule;
 pub mod status;
+pub mod trigger;
 
 pub use self::{
     condition::Condition, condition_result::ConditionResult, constraint::Constraint,
-    context::Context, rule::Rule, status::Status,
+    context::Context, rule::Rule, status::Status, trigger::Trigger,
 };
