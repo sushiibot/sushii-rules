@@ -1,3 +1,4 @@
+pub mod action;
 pub mod condition;
 pub mod condition_result;
 pub mod constraint;
@@ -8,6 +9,6 @@ pub mod status;
 pub mod trigger;
 
 pub use self::{
-    condition::Condition, condition_result::ConditionResult, constraint::Constraint,
-    context::Context, rule::Rule, status::Status, trigger::Trigger,
+    action::Action, condition::Condition, condition_result::ConditionResult,
+    constraint::Constraint, context::Context, rule::Rule, status::Status, trigger::Trigger,
 };

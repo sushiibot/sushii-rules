@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use twilight_model::gateway::event::DispatchEvent;
 
-use crate::model::{Condition, Context, Trigger};
+use crate::model::{Action, Condition, Context, Trigger};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct Rule {
